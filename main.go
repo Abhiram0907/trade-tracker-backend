@@ -4,6 +4,7 @@ import (
     "fmt"
     "github.com/gin-gonic/gin"
     "os"
+    "github.com/gin-contrib/cors"
 )
 
 type Response struct {
@@ -37,6 +38,15 @@ func main() {
     fmt.Println("Press Ctrl+C to stop the server")
     
     r := gin.Default()
+    
+    // Configure CORS
+    config := cors.DefaultConfig()
+    config.AllowOrigins = []string{"http://localhost:3000"} // Add your frontend URL
+    config.AllowCredentials = true
+    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+    config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+    
+    r.Use(cors.New(config))
     
     r.GET("/health", healthHandler)
     r.GET("/test", testHandler)
