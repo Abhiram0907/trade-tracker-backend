@@ -1,13 +1,33 @@
 package main
 
 import (
+    "encoding/json"
     "fmt"
     "net/http"
     "os"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hello from Render + Go!")
+type Response struct {
+    Message string `json:"message"`
+    Status  int    `json:"status"`
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    response := Response{
+        Message: "health",
+        Status:  200,
+    }
+    json.NewEncoder(w).Encode(response)
+}
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    response := Response{
+        Message: "hello world",
+        Status:  200,
+    }
+    json.NewEncoder(w).Encode(response)
 }
 
 func main() {
@@ -19,6 +39,7 @@ func main() {
     fmt.Printf("Starting server on port %s...\n", port)
     fmt.Println("Press Ctrl+C to stop the server")
     
-    http.HandleFunc("/", handler)
+    http.HandleFunc("/health", healthHandler)
+    http.HandleFunc("/test", testHandler)
     http.ListenAndServe("0.0.0.0:"+port, nil)
 } 
