@@ -14,7 +14,7 @@ type Response struct {
 
 func healthHandler(c *gin.Context) {
     response := Response{
-        Message: "health",
+        Message: "HEALTH HANDLER",
         Status:  200,
     }
     c.JSON(200, response)
@@ -22,7 +22,7 @@ func healthHandler(c *gin.Context) {
 
 func testHandler(c *gin.Context) {
     response := Response{
-        Message: "hello world",
+        Message: "TEST HANDLER",
         Status:  200,
     }
     c.JSON(200, response)
