@@ -1,10 +1,10 @@
 package main
 
 import (
-    "encoding/json"
     "fmt"
-    "net/http"
+    "github.com/gin-gonic/gin"
     "os"
+    "github.com/gin-contrib/cors"
 )
 
 type Response struct {
@@ -12,22 +12,20 @@ type Response struct {
     Status  int    `json:"status"`
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
+func healthHandler(c *gin.Context) {
     response := Response{
         Message: "health",
         Status:  200,
     }
-    json.NewEncoder(w).Encode(response)
+    c.JSON(200, response)
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
+func testHandler(c *gin.Context) {
     response := Response{
         Message: "hello world",
         Status:  200,
     }
-    json.NewEncoder(w).Encode(response)
+    c.JSON(200, response)
 }
 
 func main() {
@@ -39,7 +37,19 @@ func main() {
     fmt.Printf("Starting server on port %s...\n", port)
     fmt.Println("Press Ctrl+C to stop the server")
     
-    http.HandleFunc("/health", healthHandler)
-    http.HandleFunc("/test", testHandler)
-    http.ListenAndServe("0.0.0.0:"+port, nil)
+    r := gin.Default()
+    
+    // Configure CORS
+    config := cors.DefaultConfig()
+    config.AllowOrigins = []string{"http://localhost:3000"} // Add your frontend URL
+    config.AllowCredentials = true
+    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+    config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+    
+    r.Use(cors.New(config))
+    
+    r.GET("/health", healthHandler)
+    r.GET("/test", testHandler)
+    
+    r.Run("0.0.0.0:" + port)
 } 
