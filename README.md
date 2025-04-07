@@ -1,26 +1,50 @@
 # Trade Tracker Backend
 
-A simple Go web server that can be deployed to Render.
+A Node.js backend server for the Trade Tracker application.
+
+## Project Structure
+
+```
+.
+├── package.json             # Project dependencies and scripts
+├── LICENSE                  # License file
+└── README.md               # This file
+```
+
+## Prerequisites
+
+- Node.js (LTS version recommended)
+- npm (comes with Node.js)
+- Git
 
 ## Running Locally
 
-1. Make sure you have Go installed (version 1.21 or later)
-2. Run the server:
+1. Clone the repository:
    ```bash
-   go run main.go
-   ```
-3. The server will start on port 8080 by default, or you can set a custom port using the PORT environment variable:
-   ```bash
-   PORT=3000 go run main.go
+   git clone https://github.com/abhi/trade-tracker-backend.git
+   cd trade-tracker-backend
    ```
 
-## Building
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-To build the application:
-```bash
-go build
-```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+## Development
+
+- The project is set up as a Node.js application
+- Uses npm for package management
+- Configured to work with Render for deployment
 
 ## Deployment
 
-This application is configured to work with Render. It will automatically use the PORT environment variable provided by Render. 
+This application is configured to work with Render. It will automatically use the PORT environment variable provided by Render.
+
+## License
+
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details. 
