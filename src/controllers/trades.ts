@@ -17,6 +17,9 @@ export async function getTrades(request: FastifyRequest<{ Querystring: TradeQuer
     });
 }
 
+interface TradeRequest {
+    my?: string;
+}
 
 export async function postTrades(request: FastifyRequest<{ Body: TradeRequest }>,reply: FastifyReply) {
     const requestBody = request.body;
