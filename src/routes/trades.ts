@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import { getTrades, postTrade } from '../controllers/trades.js';
+import { getTrades, postTrades } from '../controllers/trades.js';
 
 export const tradeRoutes = async (fastify: FastifyInstance) => {
-  fastify.get('/trades', getTrades);
-  fastify.post('/create-trade', postTrade);
+  fastify.get('/getTrades', getTrades);
+  fastify.post('/postTrades', postTrades);
 };

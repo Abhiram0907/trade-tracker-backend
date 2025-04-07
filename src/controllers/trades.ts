@@ -1,9 +1,28 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export async function getTrades(request: FastifyRequest, reply: FastifyReply) {
-    return reply.send({ message: 'Get all trades', status: 200 });
+interface TradeQueryParams {
+    first?: string;
+    last?: string;
+    // Add other query parameters as needed
 }
 
-export async function postTrade(request: FastifyRequest, reply: FastifyReply) {
-    return reply.send({ message: 'Create new trade' });
+export async function getTrades(request: FastifyRequest<{ Querystring: TradeQueryParams }>, reply: FastifyReply) {
+    const { first, last } = request.query;
+    console.log('request', request.body);
+
+    return reply.send({ 
+        message: 'Received test query parameter: ' + first + ' and last query parameter: ' + last, 
+        status: 200,
+        data: { first, last }
+    });
+}
+
+
+export async function postTrades(request: FastifyRequest<{ Body: TradeRequest }>,reply: FastifyReply) {
+    const requestBody = request.body;
+    return reply.send({ 
+        message: 'Received test query parameter: ' +  requestBody, 
+        status: 200,
+        data: { requestBody }
+    });
 }
