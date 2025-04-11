@@ -8,4 +8,6 @@ export interface AddTradeRequest {
   exit_time: string;
   user_id?: string;
   journal_id?: number;
+  fees_plus_commissions?: number;
+  // market_type?: 'stocks' | 'futures' | 'options';
 }

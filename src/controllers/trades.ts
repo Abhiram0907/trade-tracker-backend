@@ -2,40 +2,59 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { AddTradeRequest } from '../types/trade.types';
 import { db } from '../plugins/db';
 import { trades } from '../db/schema';
+import { eq, and } from 'drizzle-orm';
 
-interface TradeQueryParams {
-    first?: string;
-    last?: string;
-    // Add other query parameters as needed
+interface GetTradeQueryParams {
+    user_id?: string;
+    journal_id?: string;
 }
 
 let pnl = 0;
 let returnPercent = 0;
 let status = '';
 
-export async function getTrades(request: FastifyRequest<{ Querystring: TradeQueryParams }>, reply: FastifyReply) {
-    const { first, last } = request.query;
-    console.log('request', request.body);
+export async function getTrades(request: FastifyRequest<{ Querystring: GetTradeQueryParams }>, reply: FastifyReply) {
+    try {
+        const { user_id, journal_id } = request.query;
+        console.log('request', request.body);
 
-    return reply.send({ 
-        message: 'Received test query parameter: ' + first + ' and last query parameter: ' + last, 
-        status: 200,
-        data: { first, last }
-    });
+        if (!user_id || !journal_id) {
+            return reply.code(400).send({ error: 'user_id and journal_id are required' });
+        }
+
+        const tradesResult = await db.select()
+            .from(trades)
+            .where(and(
+                eq(trades.user_id, user_id),
+                // eq(trades.journal_id, journal_id)
+            ));
+
+        return reply.send({ 
+            message: 'Received test query parameter: ' + user_id + ' and last query parameter: ' + journal_id, 
+            status: 200,
+            data: tradesResult
+        });
+    } catch (err) {
+        console.error('Trade retrieval failed:', err);
+        return reply.code(500).send({ error: 'Failed to retrieve trades for user: ' + request.query.user_id + ' and journal: ' + request.query.journal_id });
+    }
+    
 }
 
-function calculatePnl(entry_price: number, exit_price: number, quantity: number, side: string) {
+function calculatePnl(entry_price: number, exit_price: number, quantity: number, side: string, fees_plus_commissions: number) {
+
+    const isBuy = side.toUpperCase() === 'BUY';
+    const priceDiff = isBuy ? exit_price - entry_price : entry_price - exit_price;
     
-    pnl = (exit_price - entry_price) * quantity;
+    pnl = priceDiff * quantity;
+    pnl -= fees_plus_commissions * quantity;
     returnPercent = (pnl / (entry_price * quantity)) * 100;
-    if(side.toUpperCase() === 'BUY' && pnl > 0) { 
+    if (pnl > 0) {
         status = 'WIN';
-    } else if(side.toUpperCase() === 'BUY' && pnl < 0) {
-        status = 'LOSS';
-    } else if(side.toUpperCase() === 'SELL' && pnl > 0) {
-        status = 'LOSS';
-    } else if(side.toUpperCase() === 'SELL' && pnl < 0) {
-        status = 'WIN';
+    } else if (pnl < 0) {
+    status = 'LOSS';
+    } else {
+    status = 'BREAKEVEN';
     }
 }
 
@@ -44,7 +63,7 @@ export async function postTrades(request: FastifyRequest<{ Body: AddTradeRequest
     try {
         const trade = request.body;
 
-        calculatePnl(trade.entry_price, trade.exit_price, trade.quantity, trade.side);
+        calculatePnl(trade.entry_price, trade.exit_price, trade.quantity, trade.side, trade.fees_plus_commissions ?? 0);
 
         const mappedTrade = {
             user_id: trade.user_id,
