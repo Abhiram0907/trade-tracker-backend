@@ -9,19 +9,17 @@ const vector = customType<{ data: number[] | null }>({
 
 export const trades = pgTable('trades', {
   id: serial('id').primaryKey(),
-  userId: text('user_id'),
+  user_id: text('user_id'),
   symbol: text('symbol').notNull(),
   side: text('side'),
   quantity: numeric('quantity'),
   entry_price: numeric('entry_price'),
-  exitPrice: numeric('exit_price'),
-  exit_price: timestamp('entry_time'),
+  exit_price: numeric('exit_price'),
+  entry_time: timestamp('entry_time'),
   exit_time: timestamp('exit_time'),
   pnl: numeric('pnl'),
   return_percent: numeric('return_percent'),
   status: text('status'),
-  strategy_tag: text('strategy_tag'),
-  notes: text('notes'),
-  tag: numeric('tag').array().default([]),
-  embedding: vector('embedding')
+  embedding: vector('embedding'),
+  journal_id: numeric('journal_id').default('1')
 });

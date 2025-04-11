@@ -6,7 +6,6 @@ export interface AddTradeRequest {
   exit_price: number;
   entry_time: string;
   exit_time: string;
-  strategy_tag: string;
-  notes?: string;
-  userId?: string;
+  user_id?: string;
+  journal_id?: number;
 }

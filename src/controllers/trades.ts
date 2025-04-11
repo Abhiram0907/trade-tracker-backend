@@ -9,6 +9,10 @@ interface TradeQueryParams {
     // Add other query parameters as needed
 }
 
+let pnl = 0;
+let returnPercent = 0;
+let status = '';
+
 export async function getTrades(request: FastifyRequest<{ Querystring: TradeQueryParams }>, reply: FastifyReply) {
     const { first, last } = request.query;
     console.log('request', request.body);
@@ -21,8 +25,18 @@ export async function getTrades(request: FastifyRequest<{ Querystring: TradeQuer
 }
 
 function calculatePnl(entry_price: number, exit_price: number, quantity: number, side: string) {
-    const pnl = (exit_price - entry_price) * quantity;
-    return pnl;
+    
+    pnl = (exit_price - entry_price) * quantity;
+    returnPercent = (pnl / (entry_price * quantity)) * 100;
+    if(side.toUpperCase() === 'BUY' && pnl > 0) { 
+        status = 'WIN';
+    } else if(side.toUpperCase() === 'BUY' && pnl < 0) {
+        status = 'LOSS';
+    } else if(side.toUpperCase() === 'SELL' && pnl > 0) {
+        status = 'LOSS';
+    } else if(side.toUpperCase() === 'SELL' && pnl < 0) {
+        status = 'WIN';
+    }
 }
 
 
@@ -30,31 +44,28 @@ export async function postTrades(request: FastifyRequest<{ Body: AddTradeRequest
     try {
         const trade = request.body;
 
-        // calculatePnl(trade.entry_price, trade.exit_price, trade.quantity, trade.side);
+        calculatePnl(trade.entry_price, trade.exit_price, trade.quantity, trade.side);
 
-        const mapTrade =
-        {
-            "userId": trade.userId,
-            "symbol": trade.symbol,
-            "side": trade.side,
-            "quantity": trade.quantity.toString(),
-            "entryPrice": trade.entry_price.toString(),
-            "exitPrice": trade.exit_price.toString(),
-            "entryTime": new Date(trade.entry_time),
-            "exitTime": new Date(trade.exit_price),
-            "pnl": "34.5",
-            "returnPercent": "3.5",
-            "status": "WIN",
-            "strategyTag": trade.strategy_tag,
-            "notes": "Entered on VWAP bounce after consolidation. Executed well with no hesitation.",
-            "embedding": null,
-        }
-    
+        const mappedTrade = {
+            user_id: trade.user_id,
+            symbol: trade.symbol,
+            side: trade.side.toUpperCase(),
+            quantity: Number(trade.quantity).toString(),
+            entry_price: Number(trade.entry_price).toString(),
+            exit_price: Number(trade.exit_price).toString(),
+            entry_time: trade.entry_time ? new Date(trade.entry_time) : null,
+            exit_time: trade.exit_time ? new Date(trade.exit_time) : null,
+            pnl: pnl !== null ? (Math.round(pnl * 10) / 10).toString() : null,
+            return_percent: returnPercent !== null ? (Math.round(returnPercent * 10) / 10).toString() : null,
+            status,
+            embedding: null,
+            journal_id: Number(trade.journal_id).toString() || '1',
+        }          
         const inserted = await db
           .insert(trades)
-          .values(mapTrade)
+          .values(mappedTrade)
           .returning();
-    
+
         return reply
           .code(201)
           .header('Location', `/api/trades/${inserted[0].id}`)
