@@ -1,6 +1,6 @@
 import { fastify } from 'fastify';
 import cors from '@fastify/cors';
-import { tradeRoutes } from './routes/trades.js';
+import { Routes } from './routes/routes.js';
 import {healthRoutes} from './routes/health.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -21,7 +21,7 @@ server.register(cors, {
     credentials: true
 });
 
-server.register(tradeRoutes);
+server.register(Routes);
 server.register(healthRoutes);
 
 async function start() {

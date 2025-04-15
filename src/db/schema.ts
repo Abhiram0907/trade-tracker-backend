@@ -1,5 +1,4 @@
-import { float } from 'drizzle-orm/mysql-core';
-import { pgTable, serial, text, numeric, timestamp, customType } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, numeric, timestamp, customType, uuid } from 'drizzle-orm/pg-core';
 
 const vector = customType<{ data: number[] | null }>({
   dataType() {
@@ -22,4 +21,13 @@ export const trades = pgTable('trades', {
   status: text('status'),
   embedding: vector('embedding'),
   journal_id: numeric('journal_id').default('1')
+});
+
+export const journals = pgTable('journals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  user_id: text('user_id').notNull(),
+  name: text('name').notNull(),
+  initial_balance: numeric('initial_balance').notNull().default("0"),
+  current_balance: numeric('current_balance').notNull().default("0"),
+  created_at: timestamp('created_at', { withTimezone: false }).defaultNow()
 });
