@@ -29,5 +29,6 @@ export const journals = pgTable('journals', {
   name: text('name').notNull(),
   initial_balance: numeric('initial_balance').notNull().default("0"),
   current_balance: numeric('current_balance').notNull().default("0"),
-  created_at: timestamp('created_at', { withTimezone: false }).defaultNow()
+  created_at: timestamp('created_at', { withTimezone: false }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: false }).defaultNow()
 });
