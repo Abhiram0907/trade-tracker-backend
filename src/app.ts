@@ -25,13 +25,15 @@ server.register(Routes);
 server.register(healthRoutes);
 
 async function start() {
-    try {
-        await server.listen({ port: 3333 });
-        console.log("Server is running on port 3333");
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
+  try {
+      const port = parseInt(process.env.PORT || '3333', 10);
+      await server.listen({ port, host: '0.0.0.0' });
+      console.log(`Server is running on port ${port}`);
+  } catch (err) {
+      console.error(err);
+      process.exit(1);
+  }
 }
+
 
 start();
