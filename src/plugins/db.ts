@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-const DATABASE_URL="postgresql://postgres.zqbktztdwzmdlqxvjdno:nornaf-Suwwa0-cycxyr@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
+const DATABASE_URL="postgresql://postgres.zqbktztdwzmdlqxvjdno:nornaf-Suwwa0-cycxyr@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
 
 export const queryClient = postgres(DATABASE_URL, {
   max: 1,

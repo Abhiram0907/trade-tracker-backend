@@ -7,3 +7,8 @@ export interface AddJournalRequest {
     initial_balance: string;
     user_id?: string;
 }
+
+export interface DeleteJournalRequest {
+    journal_id: string;
+    user_id?: string;
+}

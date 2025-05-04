@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AddJournalRequest, GetAllJournalsRequest } from "../types/journal.types";
+import { AddJournalRequest, DeleteJournalRequest, GetAllJournalsRequest } from "../types/journal.types";
 import { db } from "../plugins/db";
 import { journals } from "../db/schema";
 import { eq, and } from 'drizzle-orm';
@@ -25,7 +25,7 @@ export async function getAllJournals(request: FastifyRequest<{ Querystring: GetA
             data: getJournalsResult
         });
     } catch (err) {
-        console.error('Trade retrieval failed:', err);
+        console.error('Get all journals failed:', err);
         return reply.code(500).send({ error: 'Failed to retrieve journals for user: ' + request.query.user_id});
     }
     
@@ -53,8 +53,40 @@ export async function addJournal(request: FastifyRequest<{ Body: AddJournalReque
             data: addJournalResults
         });
     } catch (err) {
-        console.error('Trade retrieval failed:', err);
+        console.error('Add Journal failed:', err);
         return reply.code(500).send({ error: 'Failed to retrieve trades for user: ' + request.body.user_id + ' and journal: ' + request.body.journal_name });
     }
     
 }
+
+export async function deleteJournal(
+    request: FastifyRequest<{ Body: DeleteJournalRequest }>,
+    reply: FastifyReply
+  ) {
+    try {
+      const { journal_id, user_id } = request.body;
+  
+      if (!journal_id || !user_id) {
+        return reply.code(400).send({ error: 'journal_id and user_id are required' });
+      }
+  
+      const deleteResult = await db
+        .delete(journals)
+        .where(and(eq(journals.id, journal_id), eq(journals.user_id, user_id)))
+        .returning();
+  
+      if (deleteResult.length === 0) {
+        return reply.code(404).send({ error: 'No journal found for given user_id and journal_id' });
+      }
+  
+      return reply.send({
+        message: `Successfully deleted journal ${journal_id} for user ${user_id}`,
+        status: 200,
+        data: deleteResult,
+      });
+    } catch (err) {
+      console.error('Delete Journal failed:', err);
+      return reply.code(500).send({ error: 'Failed to delete journal for user: ' + request.body.user_id });
+    }
+  }
+  

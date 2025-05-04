@@ -35,7 +35,7 @@ export async function getTrades(request: FastifyRequest<{ Querystring: GetTradeQ
             data: tradesResult
         });
     } catch (err) {
-        console.error('Trade retrieval failed:', err);
+        console.error('Get trades failed:', err);
         return reply.code(500).send({ error: 'Failed to retrieve trades for user: ' + request.query.user_id + ' and journal: ' + request.query.journal_id });
     }
     
