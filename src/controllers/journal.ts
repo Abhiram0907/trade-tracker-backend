@@ -14,15 +14,18 @@ export async function getAllJournals(request: FastifyRequest<{ Querystring: GetA
 
         const getJournalsResult = await db.select()
             .from(journals)
-            .where(and(
-                eq(journals.user_id, user_id),
-                // eq(trades.journal_id, journal_id)
-            ));
+            .where(eq(journals.user_id, user_id))
+            .orderBy(journals.created_at);
+          
+        const journalsWithIndex = getJournalsResult.map((journal, index) => ({
+            ...journal,
+            index,
+          }));
 
         return reply.send({ 
             message: 'Received Journals for: ' + user_id, 
             status: 200,
-            data: getJournalsResult
+            data: journalsWithIndex
         });
     } catch (err) {
         console.error('Get all journals failed:', err);

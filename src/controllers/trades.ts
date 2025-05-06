@@ -26,7 +26,7 @@ export async function getTrades(request: FastifyRequest<{ Querystring: GetTradeQ
             .from(trades)
             .where(and(
                 eq(trades.user_id, user_id),
-                // eq(trades.journal_id, journal_id)
+                eq(trades.journal_id, journal_id)
             ));
 
         return reply.send({ 
